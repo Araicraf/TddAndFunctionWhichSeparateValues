@@ -2,16 +2,22 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <utility>
+typedef std::string input;
+typedef std::string token;
+typedef std::vector<token> output;
 
-std::vector<std::string> separateValuesWithInputSeparator(std::string input, char separator = ' ')
+extern std::pair <input, output> paramArguments[6];
+
+output separateValuesWithInputSeparator(input inputArg, char separator = ' ')
 {
-	std::vector<std::string> values;
+	output values;
 
-	for (unsigned int i = 0; i < input.size(); ++i)
+	for (unsigned int i = 0; i < inputArg.size(); ++i)
 	{	
-		std::string value;
-		for ( ; i < input.size() && input.at(i) != separator; ++i)
-			value += input.at(i);
+		token value;
+		for ( ; i < inputArg.size() && inputArg.at(i) != separator; ++i)
+			value += inputArg.at(i);
 		if(!value.empty())
 			values.push_back(value);
 	}
@@ -19,80 +25,31 @@ std::vector<std::string> separateValuesWithInputSeparator(std::string input, cha
 	return values;
 }
 
-class SeparateValuesWithInputSeparatorTest: public ::testing::Test
+class SeparateValuesWithInputSeparatorTest
+	: public ::testing::TestWithParam< std::pair <input, output > >
 {
-protected:
-	std::vector<std::string> result;
-	std::string input;
+
 };
 
-TEST_F(SeparateValuesWithInputSeparatorTest, EmptyInput)
+INSTANTIATE_TEST_CASE_P(InstantiationName,
+                        SeparateValuesWithInputSeparatorTest,
+                        ::testing::ValuesIn(paramArguments));
+
+TEST_P(SeparateValuesWithInputSeparatorTest, FromEmptyInputToDiffrentStringsInput)
 {
-	input = "";
-	result = separateValuesWithInputSeparator(input);
-	std::vector<std::string> expected;
+	input inputArg = GetParam().first;
+	output result = separateValuesWithInputSeparator(inputArg);
+	output expected(GetParam().second);
 	ASSERT_EQ(expected.size(), result.size());
 	for (unsigned int i = 0; i < expected.size(); ++i)
 		EXPECT_EQ(expected[i], result[i]);
 }
 
-TEST_F(SeparateValuesWithInputSeparatorTest, OneLetterInput)
-{
-	input = "A";
-	result = separateValuesWithInputSeparator(input);
-	std::vector<std::string> expected;
-	expected.push_back("A");
-	ASSERT_EQ(expected.size(), result.size());
-	for (unsigned int i = 0; i < expected.size(); ++i)
-		EXPECT_EQ(expected[i], result[i]);
-}
 
-TEST_F(SeparateValuesWithInputSeparatorTest, OneLetterInputWithSpaceSeparator)
-{
-	input = "A ";
-	result = separateValuesWithInputSeparator(input);
-	std::vector<std::string> expected;
-	expected.push_back("A");
-	ASSERT_EQ(expected.size(), result.size());
-	for (unsigned int i = 0; i < expected.size(); ++i)
-		EXPECT_EQ(expected[i], result[i]);
-}
 
-TEST_F(SeparateValuesWithInputSeparatorTest, ThreeLetterInputWithSpaceSeparator)
-{
-	input = "Aaa ";
-	result = separateValuesWithInputSeparator(input);
-	std::vector<std::string> expected;
-	expected.push_back("Aaa");
-	ASSERT_EQ(expected.size(), result.size());
-	for (unsigned int i = 0; i < expected.size(); ++i)
-		EXPECT_EQ(expected[i], result[i]);
-}
 
-TEST_F(SeparateValuesWithInputSeparatorTest, ThreeOneLetterInputWithSpaceSeparator)
-{
-	input = "A a b";
-	result = separateValuesWithInputSeparator(input);
-	std::vector<std::string> expected;
-	expected.push_back("A");
-	expected.push_back("a");
-	expected.push_back("b");
-	ASSERT_EQ(expected.size(), result.size());
-	for (unsigned int i = 0; i < expected.size(); ++i)
-		EXPECT_EQ(expected[i], result[i]);
-}
-
-TEST_F(SeparateValuesWithInputSeparatorTest, ThreeWordInputWithSpaceSeparator)
-{
-	input = "Aaa aaa bbb";
-	result = separateValuesWithInputSeparator(input);
-	std::vector<std::string> expected;
-	expected.push_back("Aaa");
-	expected.push_back("aaa");
-	expected.push_back("bbb");
-	ASSERT_EQ(expected.size(), result.size());
-	for (unsigned int i = 0; i < expected.size(); ++i)
-		EXPECT_EQ(expected[i], result[i]);
-}
-
-//TEST_F(SeparateValuesWithInputSeparatorTest, ThreeWordInputWithSpaceSeparator)
+//TEST_P(SeparateValuesWithInputSeparatorTest, ThreeWordInputWithSpaceSeparator)
+//{
+//
+//
+//}
